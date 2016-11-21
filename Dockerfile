@@ -18,6 +18,13 @@ RUN yum -y update \
  && mkdir -p ~/src/buildscripts \
  && git clone --depth=1 https://github.com/libjpeg-turbo/buildscripts.git ~/src/buildscripts/libjpeg-turbo \
  && ~/src/buildscripts/libjpeg-turbo/autotools.install \
+ && pushd /opt \
+ && wget --no-check-certificate https://cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz \
+ && tar xf cmake-2.8.12.2-Linux-i386.tar.gz \
+ && rm cmake-2.8.12.2-Linux-i386.tar.gz \
+ && mv cmake-2.8.12.2-Linux-i386 cmake \
+ && for i in /opt/cmake/bin/*; do ln -fs $i /usr/bin/; done \
+ && popd \
  && git clone --depth=1 https://gitlab.com/debsigs/debsigs.git -b debsigs-0.1.15%7Eroam1 ~/src/debsigs \
  && pushd ~/src/debsigs \
  && perl Makefile.PL \
