@@ -33,7 +33,7 @@ RUN cat /etc/yum.repos.d/CentOS-Base.repo | sed s/^mirrorlist=/#mirrorlist=/g | 
  && ln -fs libssl.so.6 /opt/openssl/lib/libssl.so \
  && ln -fs libcrypto.so.6 /opt/openssl/lib/libcrypto.so \
  && export LD_LIBRARY_PATH=/opt/openssl/lib:$LD_LIBRARY_PATH \
- && git clone --depth=1 https://github.com/libjpeg-turbo/buildscripts.git ~/src/buildscripts/libjpeg-turbo \
+ && git clone --depth=1 https://github.com/libjpeg-turbo/buildscripts.git -b 1.5.x ~/src/buildscripts/libjpeg-turbo \
  && ~/src/buildscripts/libjpeg-turbo/autotools.install \
  && pushd /opt \
  && wget --no-check-certificate https://cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz \
