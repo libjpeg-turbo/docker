@@ -20,6 +20,19 @@ RUN cat /etc/yum.repos.d/CentOS-Base.repo | sed s/^mirrorlist=/#mirrorlist=/g | 
     wget.x86_64 \
     zip.x86_64 \
  && mkdir -p ~/src/buildscripts \
+ && pushd ~/src \
+ && wget http://www.openssl.org/source/openssl-1.0.2n.tar.gz \
+ && tar xfz openssl-1.0.2n.tar.gz \
+ && pushd openssl-1.0.2n \
+ && ./config --prefix=/opt/openssl shared \
+ && make install \
+ && popd \
+ && popd \
+ && mv /opt/openssl/lib/libssl.so.1.0.0 /opt/openssl/lib/libssl.so.6 \
+ && mv /opt/openssl/lib/libcrypto.so.1.0.0 /opt/openssl/lib/libcrypto.so.6 \
+ && ln -fs libssl.so.6 /opt/openssl/lib/libssl.so \
+ && ln -fs libcrypto.so.6 /opt/openssl/lib/libcrypto.so \
+ && export LD_LIBRARY_PATH=/opt/openssl/lib:$LD_LIBRARY_PATH \
  && git clone --depth=1 https://github.com/libjpeg-turbo/buildscripts.git ~/src/buildscripts/libjpeg-turbo \
  && ~/src/buildscripts/libjpeg-turbo/autotools.install \
  && pushd /opt \
@@ -83,7 +96,8 @@ RUN cat /etc/yum.repos.d/CentOS-Base.repo | sed s/^mirrorlist=/#mirrorlist=/g | 
  && rm -rf /tmp/*
 
 # Set environment
-ENV PATH /opt/autotools/bin:${PATH}
+ENV PATH /opt/autotools/bin:/opt/openssl/bin:${PATH}
+ENV LD_LIBRARY_PATH /opt/openssl/lib:${LD_LIBRARY_PATH}
 
 # Set default command
 CMD ["/bin/bash"]
