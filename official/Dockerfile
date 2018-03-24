@@ -59,8 +59,8 @@ RUN cat /etc/yum.repos.d/CentOS-Base.repo | sed s/^mirrorlist=/#mirrorlist=/g | 
  && yum -y remove audit-libs-python fontconfig libfontenc libgpg-error libselinux-python libsemanage libtiff libFS libICE texinfo ttmkfdir \
  && mkdir /usr/java \
  && ln -fs /etc/alternatives/java_sdk /usr/java/default \
- && curl -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u101-b13/jdk-8u101-linux-i586.tar.gz | tar -C /usr/java/ -xz \
- && ln -fs /usr/java/jdk1.8.0_101 /usr/java/default32 \
+ && curl -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-i586.tar.gz | tar -C /usr/java/ -xz \
+ && ln -fs /usr/java/jdk1.8.0_161 /usr/java/default32 \
  && rm -rf /usr/java/default32/*src.zip \
            /usr/java/default32/lib/missioncontrol \
            /usr/java/default32/lib/visualvm \
