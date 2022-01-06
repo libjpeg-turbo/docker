@@ -31,6 +31,44 @@ RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1
  && tar xf cmake-2.8.12.2-Linux-i386.tar.gz \
  && rm cmake-2.8.12.2-Linux-i386.tar.gz \
  && mv cmake-2.8.12.2-Linux-i386 cmake \
+ && wget 'https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
+ && tar xf 'gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
+ && rm 'gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
+ && mv gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu gcc.arm64 \
+ && rm -rf /opt/gcc.arm64/aarch64-none-linux-gnu/bin/ld.gold \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/include \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/lib64 \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/bin \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/lib64/*atomic* \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/lib64/*fortran* \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/lib64/*gomp* \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/lib64/*san* \
+           /opt/gcc.arm64/aarch64-none-linux-gnu/libc/usr/lib64/*stdc++* \
+           /opt/gcc.arm64/bin/*++* \
+           /opt/gcc.arm64/bin/*fortran* \
+           /opt/gcc.arm64/bin/*gcov* \
+           /opt/gcc.arm64/bin/*gdb* \
+           /opt/gcc.arm64/bin/*ld.gold* \
+           /opt/gcc.arm64/lib/gcc/aarch64-none-linux-gnu/9.2.1/*gcov* \
+           /opt/gcc.arm64/lib/gcc/aarch64-none-linux-gnu/9.2.1/plugin \
+           /opt/gcc.arm64/libexec/gcc/aarch64-none-linux-gnu/9.2.1/cc1plus \
+           /opt/gcc.arm64/libexec/gcc/aarch64-none-linux-gnu/9.2.1/f951 \
+           /opt/gcc.arm64/libexec/gcc/aarch64-none-linux-gnu/9.2.1/lto* \
+           /opt/gcc.arm64/libexec/gcc/aarch64-none-linux-gnu/9.2.1/plugin \
+           /opt/gcc.arm64/share \
+ && chown -R root:root gcc.arm64 \
+ && wget https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u312-b07/OpenJDK8U-jdk_aarch64_linux_hotspot_8u312b07.tar.gz \
+ && tar xf OpenJDK8U-jdk_aarch64_linux_hotspot_8u312b07.tar.gz \
+ && rm OpenJDK8U-jdk_aarch64_linux_hotspot_8u312b07.tar.gz \
+ && mv jdk8u312-b07 openjdk.arm64 \
+ && rm -rf /opt/openjdk.arm64/bin \
+           /opt/openjdk.arm64/jre/bin \
+           /opt/openjdk.arm64/man \
+           /opt/openjdk.arm64/sample \
+           /opt/openjdk.arm64/src.zip \
+ && shopt -s extglob \
+ && find /opt/openjdk.arm64/jre/lib/* -maxdepth 0 ! -name aarch64 | xargs rm -rf \
+ && find /opt/openjdk.arm64/lib/* -maxdepth 0 ! -name aarch64 | xargs rm -rf \
  && popd \
  && git clone --depth=1 https://gitlab.com/debsigs/debsigs.git -b debsigs-0.1.15%7Eroam1 ~/src/debsigs \
  && pushd ~/src/debsigs \
