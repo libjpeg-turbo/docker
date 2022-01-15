@@ -70,6 +70,12 @@ RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1
  && find /opt/openjdk.arm64/jre/lib/* -maxdepth 0 ! -name aarch64 | xargs rm -rf \
  && find /opt/openjdk.arm64/lib/* -maxdepth 0 ! -name aarch64 | xargs rm -rf \
  && popd \
+ && mkdir ~/rpm \
+ && pushd ~/rpm \
+ && rpm2cpio http://mirror.centos.org/altarch/7/updates/aarch64/Packages/rpm-4.11.3-48.el7_9.aarch64.rpm | cpio -idv \
+ && mv usr/lib/rpm/platform/aarch64-linux /usr/lib/rpm/platform \
+ && popd \
+ && rm -rf ~/rpm \
  && git clone --depth=1 https://gitlab.com/debsigs/debsigs.git -b debsigs-0.1.15%7Eroam1 ~/src/debsigs \
  && pushd ~/src/debsigs \
  && echo -e '--- a/debsigs\n+++ b/debsigs\n@@ -101,7 +101,7 @@ sub cmd_sign($) {\n   #  my $gpgout = forktools::forkboth($arfd, $sigfile, "/usr/bin/gpg",\n   #"--detach-sign");\n \n-  my @cmdline = ("gpg", "--openpgp", "--detach-sign");\n+  my @cmdline = ("gpg1", "--openpgp", "--detach-sign");\n \n   if ($key) {\n     push (@cmdline, "--default-key", $key);' >patch \
