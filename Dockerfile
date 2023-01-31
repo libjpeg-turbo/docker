@@ -1,36 +1,52 @@
-FROM centos:6
+FROM centos:7
 
-RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1e-58.el6_10.x86_64.rpm \
- && cat /etc/yum.repos.d/CentOS-Base.repo | sed s/^mirrorlist=/#mirrorlist=/g | sed 's@^#baseurl=http://mirror\.centos\.org/centos/\$releasever@baseurl=https://vault.centos.org/6.10@g' >/etc/yum.repos.d/CentOS-Base.repo.new \
- && mv -f /etc/yum.repos.d/CentOS-Base.repo.new /etc/yum.repos.d/CentOS-Base.repo \
- && cat /etc/yum.repos.d/CentOS-fasttrack.repo | sed s/^mirrorlist=/#mirrorlist=/g | sed 's@^#baseurl=http://mirror\.centos\.org/centos/\$releasever@baseurl=https://vault.centos.org/6.10@g' >/etc/yum.repos.d/CentOS-fasttrack.repo.new \
- && mv -f /etc/yum.repos.d/CentOS-fasttrack.repo.new /etc/yum.repos.d/CentOS-fasttrack.repo \
- && yum -y update \
+RUN yum -y update \
  && yum -y install epel-release.noarch \
  && yum -y install \
-    dpkg.x86_64 \
-    expect.x86_64 \
-    gcc.x86_64 \
-    gnupg.x86_64 \
-    glibc-devel.x86_64 \
+    audit-libs-devel \
+    automake \
+    binutils-devel \
+    bzip2-devel \
+    cmake \
+    dbus-devel \
+    dpkg \
+    elfutils-devel \
+    elfutils-libelf-devel \
+    expect \
+    file-devel \
+    gcc \
+    gettext-devel \
+    git \
+    glibc-devel \
     glibc-devel.i686 \
-    git.x86_64 \
-    java-1.6.0-openjdk.x86_64 \
-    java-1.6.0-openjdk-devel.x86_64 \
-    https://vault.centos.org/6.10/os/i386/Packages/java-1.6.0-openjdk-1.6.0.41-1.13.13.1.el6_8.i686.rpm \
-    libgcc.i686 \
-    make.x86_64 \
-    rpm-build.x86_64 \
-    wget.x86_64 \
-    yasm.x86_64 \
+    gnupg2 \
+    gnupg1 \
+    ima-evm-utils-devel \
+    java-1.8.0-openjdk-devel \
+    java-1.8.0-openjdk-devel.i686 \
+    libacl-devel \
+    libarchive-devel \
+    libcap-devel \
+    libselinux-devel \
+    libtool \
+    libzstd-devel \
+    lua-devel \
+    make \
+    ncurses-devel \
+    openssl-devel \
     perl-ExtUtils-MakeMaker \
-    zip.x86_64 \
-    https://www.rpmfind.net/linux/remi/enterprise/6/remi/x86_64/gnupg1-1.4.23-1.el6.remi.x86_64.rpm \
+    popt-devel \
+    python2-devel \
+    python3-devel \
+    readline-devel \
+    redhat-rpm-config \
+    rpm-build \
+    wget \
+    xz-devel \
+    yasm \
+    zip \
+    zstd \
  && pushd /opt \
- && wget https://cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz \
- && tar xf cmake-2.8.12.2-Linux-i386.tar.gz \
- && rm cmake-2.8.12.2-Linux-i386.tar.gz \
- && mv cmake-2.8.12.2-Linux-i386 cmake \
  && wget 'https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
  && tar xf 'gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
  && rm 'gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz?revision=61c3be5d-5175-4db6-9030-b565aae9f766&hash=CB9A16FCC54DC7D64F8BBE8D740E38A8BF2C8665' \
@@ -72,11 +88,15 @@ RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1
  && popd \
  && mkdir ~/rpm \
  && pushd ~/rpm \
- && rpm2cpio http://mirror.centos.org/altarch/7/updates/aarch64/Packages/rpm-4.11.3-48.el7_9.aarch64.rpm | cpio -idv \
- && mv usr/lib/rpm/platform/aarch64-linux /usr/lib/rpm/platform \
+ && wget https://dl.rockylinux.org/vault/rocky/8.4/BaseOS/source/tree/Packages/rpm-4.14.3-13.el8.src.rpm \
+ && rpmbuild --rebuild rpm-4.14.3-13.el8.src.rpm \
  && popd \
  && rm -rf ~/rpm \
- && git clone --depth=1 https://gitlab.com/debsigs/debsigs.git -b debsigs-0.1.15%7Eroam1 ~/src/debsigs \
+ && pushd ~/rpmbuild/RPMS/x86_64 \
+ && rpm -Uvh rpm-4* rpm-libs-* rpm-build-* python2-rpm-* rpm-sign-* \
+ && popd \
+ && rm -rf ~/rpmbuild \
+ && git clone --depth=1 https://gitlab.com/debsigs/debsigs.git -b debsigs-0.1.18-debian ~/src/debsigs \
  && pushd ~/src/debsigs \
  && echo -e '--- a/debsigs\n+++ b/debsigs\n@@ -101,7 +101,7 @@ sub cmd_sign($) {\n   #  my $gpgout = forktools::forkboth($arfd, $sigfile, "/usr/bin/gpg",\n   #"--detach-sign");\n \n-  my @cmdline = ("gpg", "--openpgp", "--detach-sign");\n+  my @cmdline = ("gpg1", "--openpgp", "--detach-sign");\n \n   if ($key) {\n     push (@cmdline, "--default-key", $key);' >patch \
  && patch -p1 <patch \
@@ -84,10 +104,36 @@ RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1
  && make install \
  && popd \
  && rm -rf ~/src \
- && yum -y remove perl-ExtUtils-MakeMaker gdbm-devel db4-cxx \
+ && yum -y autoremove \
+    audit-libs-devel \
+    automake \
+    binutils-devel \
+    bzip2-devel \
+    db4-cxx \
+    dbus-devel \
+    elfutils-devel \
+    elfutils-libelf-devel \
+    file-devel \
+    gdbm-devel \
+    gettext-devel \
+    ima-evm-utils-devel \
+    libacl-devel \
+    libarchive-devel \
+    libcap-devel \
+    libselinux-devel \
+    libtool \
+    libzstd-devel \
+    lua-devel \
+    ncurses-devel \
+    openssl-devel \
+    perl-ExtUtils-MakeMaker \
+    popt-devel \
+    python2-devel \
+    python3-devel \
+    readline-devel \
+    xz-devel \
  && mkdir /usr/java \
- && rpm -i --force https://vault.centos.org/6.10/os/i386/Packages/java-1.6.0-openjdk-devel-1.6.0.41-1.13.13.1.el6_8.i686.rpm \
- && ln -fs /usr/lib/jvm/java-1.6.0-openjdk /usr/java/default32 \
+ && ln -fs /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.362.b08-1.el7_9.i386 /usr/java/default32 \
  && cd / \
  && yum clean all \
  && find /usr/lib/locale/ -mindepth 1 -maxdepth 1 -type d -not -path '*en_US*' -exec rm -rf {} \; \
@@ -99,9 +145,6 @@ RUN rpm -Uvh https://vault.centos.org/6.10/updates/x86_64/Packages/openssl-1.0.1
  && find /usr/share/{man,doc,info} -type f -delete \
  && rm -rf /etc/ld.so.cache \ && rm -rf /var/cache/ldconfig/* \
  && rm -rf /tmp/*
-
-# Set environment
-ENV PATH /opt/cmake/bin:${PATH}
 
 # Set default command
 CMD ["/bin/bash"]
